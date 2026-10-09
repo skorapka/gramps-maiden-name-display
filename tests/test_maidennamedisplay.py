@@ -88,7 +88,25 @@ def test_unmarried_woman_unchanged(displayer):
     assert displayer.display(person) == "Marie Nováková"
 
 
-def test_men_are_never_changed(displayer):
+def test_changed_surname_shows_birth_surname_for_men(displayer):
+    person = make_person(
+        Person.MALE,
+        make_name("Rudolf", ["Vaněk"], NameType.AKA),
+        make_name("Rudolf", ["Vocásek"], NameType.BIRTH),
+    )
+    assert displayer.display(person) == "Rudolf Vaněk (Vocásek)"
+
+
+def test_spelling_variant_as_aka_alternate_is_not_shown(displayer):
+    person = make_person(
+        Person.MALE,
+        make_name("Karel", ["Rathuský"], NameType.BIRTH),
+        make_name("Karel", ["Rathauzsky"], NameType.AKA),
+    )
+    assert displayer.display(person) == "Karel Rathuský"
+
+
+def test_men_with_married_name_are_not_changed(displayer):
     person = make_person(
         Person.MALE,
         make_name("Jiri", ["Slovacek"], NameType.MARRIED),

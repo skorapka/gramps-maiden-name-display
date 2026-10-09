@@ -17,7 +17,7 @@ register(
         "Shows a married woman as 'Given Married (Maiden)' everywhere, "
         "computed from her Married Name and Birth Name"
     ),
-    version="0.1.1",
+    version="0.2.0",
     gramps_target_version="6.0",
     status=STABLE,
     fname="maidennamedisplay.py",

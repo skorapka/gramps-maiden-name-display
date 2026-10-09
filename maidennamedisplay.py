@@ -20,6 +20,8 @@ A woman whose preferred name is a "Married Name" and who also has an
 alternate "Birth Name" with a different surname is displayed as
 "Given Married (Maiden)" in every name format, for example
 "Ladislava Slováčková (Malotová)" or "Slováčková (Malotová), Ladislava".
+The same applies to anyone whose preferred name is an "Also Known As"
+name, i.e. a changed surname: "Rudolf Vaněk (Vocásek)".
 
 Nothing is written to the database: the display is computed from the
 stored Married Name and Birth Name, so correcting either one updates the
@@ -59,14 +61,18 @@ def maiden_surname(person):
     """
     Return the maiden surname to show for the person, or "" if none.
 
-    Rules: female, preferred name of type Married Name, first alternate
-    name of type Birth Name has a primary surname that is not already
-    part of the preferred name.
+    Rules: the preferred name is a Married Name (women only) or an
+    Also Known As name (anyone: a changed surname, e.g. Vaněk born
+    Vocásek), and the first alternate Birth Name has a primary surname
+    that is not already part of the preferred name.
     """
-    if person is None or person.get_gender() != Person.FEMALE:
+    if person is None:
         return ""
     primary = person.get_primary_name()
-    if primary.get_type() != NameType.MARRIED:
+    shown_types = {NameType.AKA}
+    if person.get_gender() == Person.FEMALE:
+        shown_types.add(NameType.MARRIED)
+    if int(primary.get_type()) not in shown_types:
         return ""
     for alternate in person.get_alternate_names():
         if alternate.get_type() != NameType.BIRTH:
