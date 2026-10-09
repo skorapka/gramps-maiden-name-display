@@ -68,6 +68,16 @@ def test_woman_keeping_both_surnames_has_no_brackets(displayer):
     assert displayer.display(person) == "Ladislava Slováčková Malotová"
 
 
+@pytest.mark.parametrize("married", ["Hábová Janečková", "Hábová-Janečková"])
+def test_both_surnames_in_one_text_has_no_brackets(displayer, married):
+    person = make_person(
+        Person.FEMALE,
+        make_name("Věra", [married], NameType.MARRIED),
+        make_name("Věra", ["Janečková"], NameType.BIRTH),
+    )
+    assert displayer.display(person) == f"Věra {married}"
+
+
 def test_same_surname_has_no_brackets(displayer):
     person = ladislava(maiden="Slováčková")
     assert displayer.display(person) == "Ladislava Slováčková"

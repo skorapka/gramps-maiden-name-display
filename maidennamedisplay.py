@@ -26,11 +26,12 @@ stored Married Name and Birth Name, so correcting either one updates the
 display everywhere.
 
 When the maiden surname is already part of the married name (a woman who
-kept both surnames, entered as one name with two surnames), no brackets
-are added: "Ladislava Slováčková Malotová".
+kept both surnames, entered as two surnames or as one text "Slováčková
+Malotová" or "Slováčková-Malotová"), no brackets are added.
 """
 
 import logging
+import re
 
 from gramps.gen.display.name import _F_FN, NameDisplay
 from gramps.gen.lib import Name, NameType, Person
@@ -46,8 +47,12 @@ _PATCHED_FLAG = "_maiden_name_display_patched"
 # Pure logic
 #
 # ------------------------------------------------------------------------
-def _surname_texts(name):
-    return {surname.get_surname().strip() for surname in name.get_surname_list()}
+def _surname_words(name):
+    """All words of all surnames, so "Hábová Janečková" typed as one surname counts too."""
+    words = set()
+    for surname in name.get_surname_list():
+        words.update(w for w in re.split(r"[\s\-]+", surname.get_surname()) if w)
+    return words
 
 
 def maiden_surname(person):
@@ -68,7 +73,8 @@ def maiden_surname(person):
             continue
         surname = alternate.get_primary_surname()
         maiden = surname.get_surname().strip() if surname else ""
-        if maiden and maiden not in _surname_texts(primary):
+        maiden_words = set(re.split(r"[\s\-]+", maiden)) - {""}
+        if maiden and not maiden_words <= _surname_words(primary):
             return maiden
         return ""
     return ""
